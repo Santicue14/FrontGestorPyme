@@ -10,7 +10,7 @@ export const GestionSectores = () => {
     const [sectorSelected, setSectorSelected] = useState({})
     const [showModal, setShowModal] = useState(false)
 
-    const toggleModal = (sector) => {
+    const toggleOnModal = (sector) => {
         setShowModal(prevState => !prevState)
         setSectorSelected(sector)
     }
@@ -89,24 +89,20 @@ export const GestionSectores = () => {
                     <tbody>
                         {filteredSectores.length !== 0 &&
                             filteredSectores.map(sector => (
-                                <SectoresTabla key={sector.id} sector={sector} user={user} toggleModal={toggleModal}/>
+                                <SectoresTabla key={sector.id} sector={sector} user={user} toggleModal={toggleOnModal} sectorSelected={sectorSelected} />
                             ))
                         }
                     </tbody>
                 </table>
             </div>
-            {showModal && <UpdateSectorModal sector={sectorSelected}/>}
+            {showModal && sectorSelected && <UpdateSectorModal sector={sectorSelected} />}
         </div>
     )
 }
 
-
-
-
-// eslint-disable-next-line react/prop-types
-const SectoresTabla = ({ sector, user,toggleModal }) => {
-    // eslint-disable-next-line react/prop-types
-    const { supervisor_mail, supervisor_apellido, supervisor_nombre, sector_nombre } = sector
+// Modifica la función toggleModal para que pase el sector correcto
+const SectoresTabla = ({ sector, user, toggleModal }) => {
+    const { supervisor_mail, supervisor_apellido, supervisor_nombre, sector_nombre } = sector;
     return (
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
             <td className="w-4 p-4">
@@ -120,45 +116,46 @@ const SectoresTabla = ({ sector, user,toggleModal }) => {
             </th>
             <td scope="row" className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                 <div className="ps-3">
-                    <div className="text-base font-semibold">{supervisor_apellido? `${supervisor_apellido}, ${supervisor_nombre}` : 'No disponible'}</div>
+                    <div className="text-base font-semibold">{supervisor_apellido ? `${supervisor_apellido}, ${supervisor_nombre}` : 'No disponible'}</div>
                     <div className="font-normal text-gray-500">{supervisor_mail}</div>
                 </div>
             </td>
-            {user.id_rol == 1 && <td>
-                <a href="#" type="button" data-modal-target="editUserModal" data-modal-show="editUserModal" className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={()=>toggleModal(sector)}>Editar sector</a>
-            </td>}
+            {user.id_rol == 1 && (
+                <td>
+                    <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => toggleModal(sector)}>Editar sector</a>
+                </td>
+            )}
         </tr>
-    )
-}
+    );
+};
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const UpdateSectorModal = ({ confirmUpdate, toggleModal, sectorSelected }) => {
-    console.log(sectorSelected);
+// UpdateSectorModal recibe sectorSelected y muestra la información
+export const UpdateSectorModal = ({ confirmUpdate, toggleModal, sector }) => {
+    const { supervisor_mail, supervisor_apellido, supervisor_nombre, sector_nombre } = sector;
     return (
         <>
             <div className="background-modal absolute w-full h-full bg-gray-500 top-0 opacity-30"></div>
-            <div id="popup-modal" tabIndex="-1" className=" flex absolute mt-24 left-[1000px] z-50 justify-center  w-full md:inset-0 ">
+            <div id="popup-modal" tabIndex="-1" className="flex absolute mt-24 left-[1000px] z-50 justify-center w-full md:inset-0">
                 <div className="relative p-4 w-full max-w-md h-fit">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                        <button type="button" className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
-                            <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                            </svg>
-                            <span className="sr-only">Close modal</span>
-                        </button>
                         <div className="p-4 md:p-5 text-center">
-                            <svg className="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Estás seguro de realizar estos cambios?</h3>
+                            <h3 className="mb-2 text-lg font-bold">Modificación de sector</h3>
+                            <form action="" className="max-w-sm mx-auto mb-4">
+                                <div>
+                                    <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white  text-left">Nombre del sector</label>
+                                    <input type="text" id="small-input" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
+                                </div>
+                            </form>
                             <button data-modal-hide="popup-modal" type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800" onClick={(e) => confirmUpdate(e)}>
                                 Sí, estoy seguro
                             </button>
-                            <button data-modal-hide="popup-modal" type="button" className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={(e) => toggleModal(e)}>No, cancelar</button>
+                            <button data-modal-hide="popup-modal" type="button" className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={toggleModal}>
+                                No, cancelar
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </>
-    )
-}
+    );
+};
