@@ -42,19 +42,23 @@ export const AuthProvider = ({ children }) => {
   const login = async (mail, password) => {
     setLoading(true)
     try {
-      const response = await axios.post(`https://${host}/login`, { mail, password }).
-        catch(
+      const response = await axios.post(`https://${host}/login`, { mail, password })
+        .then((response) => {
+          console.log(response);
+          if (response.data) {
+            const { token } = response.data
+            Cookies.set('token', token, { expires: 7 })
+            setAuth(token)
+            getUserData(token)
+          }
+        })
+        .catch(
           (error) => {
             const msg = error.message == "Network Error" ? 'Hay problemas con el servidor' : 'Ocurrió un error'
             return msg
           }
         )
-      if (response.data) {
-        const { token } = response.data
-        Cookies.set('token', token, { expires: 7 })
-        setAuth(token)
-        getUserData(token)
-      }
+      return response
     } catch (error) {
       console.error(error)
       return error
